@@ -3,7 +3,7 @@
     <v-row class="text-center">
       <v-col cols="12">
         <v-img
-                :src="require('../assets/logo.svg')"
+                :src="require('../assets/logo.jpg')"
                 class="my-3"
                 contain
                 height="100"
@@ -94,14 +94,14 @@
 </template>
 
 <script>
-import HelloWorld from '@/components/HelloWorld.vue'
+
 
 export default {
   name: 'App',
-  components: { HelloWorld },
 
   data: () => ({
     all:true,
+
   }),
   computed:{
     percentage(){
@@ -125,22 +125,28 @@ export default {
     },
   },
   methods:{
-    getCurrentUrl(){
-      let url = ''
-      chrome.tabs.query({'active': true, 'windowId': chrome.windows.WINDOW_ID_CURRENT},
-              function(tabs){
-                url = tabs[0].url
-              }
-      )
-      return url
-    },
-    adviseMe(){
-      const payload ={
-        "link": "https://www.amazon.fr/Neutrogena-Vclear-Nettoyant-Exfoliant-Pamplemousse/dp/B0719FR9XV/ref=sr_1_5?__mk_fr_FR=%C3%85M%C3%85%C5%BD%C3%95%C3%91&dchild=1&keywords=Masque+Peeling+Glycolique+-+Caudalie&s=be"
-      }
+      getTabID() {
+            return new Promise((resolve, reject) => {
+                try {
+                    chrome.tabs.query({
+                        active: true,
+                    }, function (tabs) {
+                        resolve(tabs[0].url)
+                    })
+                } catch (e) {
+                    reject(e)
+                }
+            })
+      },
 
-      this.$store.dispatch('getAdvise',payload)
-    }
+      async adviseMe(){
+            let url = await this.getTabID()
+
+            const payload ={
+                "link" : url
+            }
+            this.$store.dispatch('getAdvise',payload)
+        }
   }
 }
 </script>
